@@ -63,7 +63,7 @@ exports.login = async (req, res) => {
     return res.json({
       message: "Usuario registrado",
       token,
-      user
+      user: userResponse
     });
   } catch (err) {
     console.error("Error en login:", err);
