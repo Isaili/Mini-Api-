@@ -9,7 +9,7 @@ exports.register = async (req, res) => {
   }
 
   try {
-    // Buscar usuario o email duplicado
+
     const existing = await User.findOne({ $or: [{ email }, { username }] });
     if (existing) return res.status(400).json({ msg: "Usuario o email ya existe" });
 
@@ -20,10 +20,21 @@ exports.register = async (req, res) => {
     const payload = { user: { id: user.id } };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    res.status(201).json({ message: "Usuario registrado", token });
+    const userResponse = {
+          id: user._id,
+          username: user.username,
+          email: user.email
+    }
+
+    return res.status(201).json({
+      message: "Usuario registrado",
+      token,
+      user: userResponse
+    });
+
   } catch (err) {
     console.error("Error al registrar usuario:", err);
-    res.status(500).json({ msg: "Error de servidor", error: err.message });
+    return res.status(500).json({ msg: "Error de servidor", error: err.message });
   }
 };
 
@@ -43,8 +54,17 @@ exports.login = async (req, res) => {
 
     const payload = { user: { id: user.id } };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const userResponse = {
+      id: user._id,
+      username: user.username,
+      email: user.email
+    }
 
-    res.json({ token });
+    return res.json({
+      message: "Usuario registrado",
+      token,
+      user
+    });
   } catch (err) {
     console.error("Error en login:", err);
     res.status(500).json({ msg: "Error de servidor", error: err.message });
